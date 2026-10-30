@@ -103,7 +103,10 @@ export function FoodImage({
         alt={alt}
         loading={eager ? 'eager' : 'lazy'}
         decoding="async"
-        fetchPriority={eager ? 'high' : 'auto'}
+        /* React 18 renders unknown lowercase DOM attributes as-is; the camelCase
+           `fetchPriority` prop only exists from React 19 and would log a DOM
+           warning here, so it is spread under its lowercase HTML name. */
+        {...({ fetchpriority: eager ? 'high' : 'auto' } as Record<string, string>)}
         className={loaded && !failed ? 'media__img is-loaded' : 'media__img'}
         onLoad={() => setLoaded(true)}
         onError={() => setFailed(true)}
