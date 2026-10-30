@@ -1,0 +1,30 @@
+# Base44 development environment for the Fire & Saffron restaurant website.
+# Runs the Vite dev server from the cloned source with live reload.
+services:
+  web:
+    image: node:22-alpine
+    working_dir: /app
+    labels:
+      - base44.project=Fire & Saffron
+      - base44.kind=web
+      - base44.port=3000
+    # Bind-mount the cloned source so edits appear without rebuilding.
+    volumes:
+      - ./:/app
+      - /app/node_modules
+    ports:
+      - "3000:5173"
+    environment:
+      # Vite: accept the preview proxy's external hostname.
+      - __VITE_ADDITIONAL_SERVER_ALLOWED_HOSTS
+      - BASE44_PREVIEW_MODE
+      - CHOKIDAR_USEPOLLING=true
+      - WATCHPACK_POLLING=true
+    command: ["sh", "-ec", "npm install --no-audit --no-fund && exec npm run dev"]
+    healthcheck:
+      test: ["CMD", "wget", "-qO-", "http://localhost:5173/"]
+      interval: 15s
+      timeout: 5s
+      retries: 5
+      start_period: 30s
+    restart: on-failure
